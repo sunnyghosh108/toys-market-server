@@ -6,7 +6,25 @@ const app =express();
 const port = process.env.PORT || 5000;
 
 // middleWare
-app.use(cors());
+   app.use(cors());
+// const corsConfig = {
+//   origin: '',
+//   credentials: true,
+//   methods: [ 'GET', 'POST', 'PUT', 'DELETE']
+// }
+
+// app.use(cors(corsConfig))
+// app.options("", cors(corsConfig))
+
+// const corsConfig = {
+//   origin: '*',
+//   credentials: true,
+//   methods: ['GET', 'POST', 'PUT', 'DELETE']
+//   }
+//   app.use(cors(corsConfig))
+//   app.options("", cors(corsConfig))
+
+
 app.use(express.json());
 
 
@@ -28,9 +46,46 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
 
     const productsCollecton=client.db('toysMarket').collection('products');
+
+    // 
+    const indexKeys = { name: 1, category: 1 }; 
+    const indexOptions = { name: "titleCategory" }; 
+    const result = await productsCollecton.createIndex(indexKeys, indexOptions);
+    console.log(result);
+
+    app.get("toysSearchByTitle/text",async(req,res)=>{
+      const searchText =req.params.text;    
+      const result = await productsCollecton.aggregate.find({
+        $or:[
+          {name:{$regex:text,$options:"i"}},
+          {category:{$regex:text, $options:"i"}},
+        ],
+      })
+      .toArray();
+      res.send(result);
+    })
+
+
+    app.put("/products/:id",async(req,res)=>{
+      const id = req.params.id;
+      const body = req.body;
+      console.log(body);
+      const filter ={_id:new ObjectId(id)};
+      const updateDoc ={
+        $set:{
+          photo:body.photo,
+          seller:body.seller,
+          category:body.category,
+        },
+      };
+      const result =await productsCollecton.updateOne(filter,updateDoc);
+      res.send(result);
+    });
+
+    // 
   
     app.get('/products',async(req,res)=>{
       const cursor =productsCollecton.find();
@@ -108,7 +163,7 @@ async function run() {
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
-    //await client.close();
+    
   }
 }
 run().catch(console.dir);
