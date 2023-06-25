@@ -101,23 +101,23 @@ async function run() {
 
 
 
-  // app.get('/allToysImg', async (req, res) => {
-  //     const result = await allToysCollection.find().toArray()
-
-  //     res.send(result)
-
-
-  // })
-
-
-
-  app.get('/allToysTabs', async (req, res) => {
+  app.get('/allToysImg', async (req, res) => {
       const result = await allToysCollection.find().toArray()
 
       res.send(result)
 
 
   })
+
+
+
+  // app.get('/allToysTabs', async (req, res) => {
+  //     const result = await allToysCollection.find().toArray()
+
+  //     res.send(result)
+
+
+  // })
 
   app.get('/singleToys/:id', async (req, res) => {
       const id = req.params.id
