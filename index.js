@@ -6,29 +6,22 @@ const app =express();
 const port = process.env.PORT || 5000;
 
 // middleWare
-   app.use(cors());
-// const corsConfig = {
-//   origin: '',
-//   credentials: true,
-//   methods: [ 'GET', 'POST', 'PUT', 'DELETE']
-// }
+  app.use(cors());
+ app.use(express.json());
 
-// app.use(cors(corsConfig))
-// app.options("", cors(corsConfig))
-
-// const corsConfig = {
-//   origin: '*',
-//   credentials: true,
-//   methods: ['GET', 'POST', 'PUT', 'DELETE']
-//   }
-//   app.use(cors(corsConfig))
-//   app.options("", cors(corsConfig))
+const corsConfig = {
+  origin: '*',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE']
+  }
+  app.use(cors(corsConfig))
+  app.options("", cors(corsConfig))
 
 
-app.use(express.json());
 
 
-console.log(process.env.DB_PASS);
+
+//console.log(process.env.DB_PASS);
 
 
 
@@ -50,48 +43,152 @@ async function run() {
 
     const productsCollecton=client.db('toysMarket').collection('products');
 
-    // 
-    const indexKeys = { name: 1, category: 1 }; 
-    const indexOptions = { name: "titleCategory" }; 
-    const result = await productsCollecton.createIndex(indexKeys, indexOptions);
-    console.log(result);
+    const database = client.db("toysMarket");
+    const allToysCollection = database.collection("allToysCollection");
+    
 
-    app.get("toysSearchByTitle/text",async(req,res)=>{
-      const searchText =req.params.text;    
-      const result = await productsCollecton.aggregate.find({
-        $or:[
-          {name:{$regex:text,$options:"i"}},
-          {category:{$regex:text, $options:"i"}},
-        ],
-      })
-      .toArray();
-      res.send(result);
-    })
+    // jungoree
+    app.get('/myToys', async (req, res) => {
+      let query = {}
+      const sorting = req.query.srt
+
+      if (req?.query?.email) {
+          query = { seller_email: req.query.email }
+      }
 
 
-    app.put("/products/:id",async(req,res)=>{
-      const id = req.params.id;
-      const body = req.body;
-      console.log(body);
-      const filter ={_id:new ObjectId(id)};
-      const updateDoc ={
-        $set:{
-          photo:body.photo,
-          seller:body.seller,
-          category:body.category,
-        },
-      };
-      const result =await productsCollecton.updateOne(filter,updateDoc);
-      res.send(result);
-    });
+      if (sorting) {
+       
 
-    // 
+          const result = await allToysCollection.find(query).sort({ price: sorting }).toArray()
+          res.send(result)
+      }
+      else {
+
+          const result = await allToysCollection.find(query).toArray()
+          res.send(result)
+      }
+  
+
+
+  })
+
+
+  app.get('/allToys/:text', async (req, res) => {
+      const currentPage = parseInt(req?.query?.page) || 0
+      const itemsPerPage = parseInt(req?.query?.limit) || 5 
+      const skip = currentPage * itemsPerPage
+    
+      console.log(itemsPerPage)
+      const searchText = req?.params?.text
+    
+
+      if (searchText == '1') {
+         console.log('this is array')
+          const result = await allToysCollection.find().skip(skip).limit(itemsPerPage).toArray()
+          res.send(result)
+
+      }
+      else {
+          const result = await allToysCollection.find({ toy_name: searchText }).toArray()
+          res.send(result)
+      }
+
+
+  
+
+  })
+
+
+
+  app.get('/allToysImg', async (req, res) => {
+      const result = await allToysCollection.find().toArray()
+
+      res.send(result)
+
+
+  })
+
+
+
+  app.get('/allToysTabs', async (req, res) => {
+      const result = await allToysCollection.find().toArray()
+
+      res.send(result)
+
+
+  })
+
+  app.get('/singleToys/:id', async (req, res) => {
+      const id = req.params.id
+      const filter = { _id: new ObjectId(id) }
+      const result = await allToysCollection.findOne(filter)
+      res.send(result)
+  
+
+  })
+
+
+  app.post('/addToys', async (req, res) => {
+      const body = req.body
+
+      const result = await allToysCollection.insertOne(body)
+      res.send(result)
+  })
+
+
+
+  app.patch('/update/:id', async (req, res) => {
+      const updateDetails = req.body
+      
+      const id = req.params.id
+      const filter = { _id: new ObjectId(id) }
+      const updated = {
+          $set: {
+              price: updateDetails.price,
+              description: updateDetails.description,
+              available_quantity: updateDetails.available_quantity
+          }
+      }
+      const result = await allToysCollection.updateOne(filter, updated)
+      res.send(result)
+  })
+
+
+
+  app.delete('/remove/:id', async (req, res) => {
+      const id = req.params.id
+      const query = { _id: new ObjectId(id) }
+      const result = await allToysCollection.deleteOne(query)
+      res.send(result)
+  })
+
+
+
+
+
+  // pagination 
+
+  app.get('/toysQuantity', async (req, res) => {
+      const result = await allToysCollection.estimatedDocumentCount()
+      res.send({ toysQuantity: result })
+  })
+
+    //end jungoree
   
     app.get('/products',async(req,res)=>{
       const cursor =productsCollecton.find();
       const result =await cursor.toArray();
       res.send(result);
     })
+    app.get('/products/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+
+
+      const result = await productsCollecton.findOne(query);
+      res.send(result);
+  })
 
     app.post('/products',async(req,res)=>{
         const newToys = req.body;
@@ -112,24 +209,7 @@ async function run() {
     })
     // 
     
-    // bookings routes
-  //   app.get('/products', async (req, res) => {
-  //     const decoded = req.decoded;
-    
-  //     let query = {};
-  //     if (req.query?.email) {
-  //         query = { email: req.query.email }
-  //     }
-  //     const result = await bookingCollection.find(query).toArray();
-  //     res.send(result);
-  // })
-
-  // app.post('/products', async (req, res) => {
-  //     const booking = req.body;
-  //     console.log(booking);
-  //     const result = await bookingCollection.insertOne(booking);
-  //     res.send(result);
-  // });
+   
   
 
   app.patch('/products/:id', async (req, res) => {
@@ -159,7 +239,7 @@ async function run() {
 
 
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
+    // await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
