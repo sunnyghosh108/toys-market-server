@@ -101,13 +101,13 @@ async function run() {
 
 
 
-  app.get('/allToysImg', async (req, res) => {
-      const result = await allToysCollection.find().toArray()
+  // app.get('/allToysImg', async (req, res) => {
+  //     const result = await allToysCollection.find().toArray()
 
-      res.send(result)
+  //     res.send(result)
 
 
-  })
+  // })
 
 
 
@@ -169,10 +169,10 @@ async function run() {
 
   // pagination 
 
-  // app.get('/toysQuantity', async (req, res) => {
-  //     const result = await allToysCollection.estimatedDocumentCount()
-  //     res.send({ toysQuantity: result })
-  // })
+  app.get('/toysQuantity', async (req, res) => {
+      const result = await allToysCollection.estimatedDocumentCount()
+      res.send({ toysQuantity: result })
+  })
 
     //end jungoree
   
