@@ -169,10 +169,10 @@ async function run() {
 
   // pagination 
 
-  app.get('/toysQuantity', async (req, res) => {
-      const result = await allToysCollection.estimatedDocumentCount()
-      res.send({ toysQuantity: result })
-  })
+  // app.get('/toysQuantity', async (req, res) => {
+  //     const result = await allToysCollection.estimatedDocumentCount()
+  //     res.send({ toysQuantity: result })
+  // })
 
     //end jungoree
   
