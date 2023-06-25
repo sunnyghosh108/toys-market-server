@@ -138,30 +138,30 @@ async function run() {
 
 
 
-  // app.patch('/update/:id', async (req, res) => {
-  //     const updateDetails = req.body
+  app.patch('/update/:id', async (req, res) => {
+      const updateDetails = req.body
       
-  //     const id = req.params.id
-  //     const filter = { _id: new ObjectId(id) }
-  //     const updated = {
-  //         $set: {
-  //             price: updateDetails.price,
-  //             description: updateDetails.description,
-  //             available_quantity: updateDetails.available_quantity
-  //         }
-  //     }
-  //     const result = await allToysCollection.updateOne(filter, updated)
-  //     res.send(result)
-  // })
-
-
-
-  app.delete('/remove/:id', async (req, res) => {
       const id = req.params.id
-      const query = { _id: new ObjectId(id) }
-      const result = await allToysCollection.deleteOne(query)
+      const filter = { _id: new ObjectId(id) }
+      const updated = {
+          $set: {
+              price: updateDetails.price,
+              description: updateDetails.description,
+              available_quantity: updateDetails.available_quantity
+          }
+      }
+      const result = await allToysCollection.updateOne(filter, updated)
       res.send(result)
   })
+
+
+
+  // app.delete('/remove/:id', async (req, res) => {
+  //     const id = req.params.id
+  //     const query = { _id: new ObjectId(id) }
+  //     const result = await allToysCollection.deleteOne(query)
+  //     res.send(result)
+  // })
 
 
 
