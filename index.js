@@ -111,22 +111,22 @@ async function run() {
 
 
 
-  // app.get('/allToysTabs', async (req, res) => {
-  //     const result = await allToysCollection.find().toArray()
+  app.get('/allToysTabs', async (req, res) => {
+      const result = await allToysCollection.find().toArray()
 
-  //     res.send(result)
-
-
-  // })
-
-  app.get('/singleToys/:id', async (req, res) => {
-      const id = req.params.id
-      const filter = { _id: new ObjectId(id) }
-      const result = await allToysCollection.findOne(filter)
       res.send(result)
-  
+
 
   })
+
+  // app.get('/singleToys/:id', async (req, res) => {
+  //     const id = req.params.id
+  //     const filter = { _id: new ObjectId(id) }
+  //     const result = await allToysCollection.findOne(filter)
+  //     res.send(result)
+  
+
+  // })
 
 
   app.post('/addToys', async (req, res) => {
