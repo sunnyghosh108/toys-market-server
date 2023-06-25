@@ -119,14 +119,14 @@ async function run() {
 
   })
 
-  // app.get('/singleToys/:id', async (req, res) => {
-  //     const id = req.params.id
-  //     const filter = { _id: new ObjectId(id) }
-  //     const result = await allToysCollection.findOne(filter)
-  //     res.send(result)
+  app.get('/singleToys/:id', async (req, res) => {
+      const id = req.params.id
+      const filter = { _id: new ObjectId(id) }
+      const result = await allToysCollection.findOne(filter)
+      res.send(result)
   
 
-  // })
+  })
 
 
   app.post('/addToys', async (req, res) => {
@@ -138,21 +138,21 @@ async function run() {
 
 
 
-  app.patch('/update/:id', async (req, res) => {
-      const updateDetails = req.body
+  // app.patch('/update/:id', async (req, res) => {
+  //     const updateDetails = req.body
       
-      const id = req.params.id
-      const filter = { _id: new ObjectId(id) }
-      const updated = {
-          $set: {
-              price: updateDetails.price,
-              description: updateDetails.description,
-              available_quantity: updateDetails.available_quantity
-          }
-      }
-      const result = await allToysCollection.updateOne(filter, updated)
-      res.send(result)
-  })
+  //     const id = req.params.id
+  //     const filter = { _id: new ObjectId(id) }
+  //     const updated = {
+  //         $set: {
+  //             price: updateDetails.price,
+  //             description: updateDetails.description,
+  //             available_quantity: updateDetails.available_quantity
+  //         }
+  //     }
+  //     const result = await allToysCollection.updateOne(filter, updated)
+  //     res.send(result)
+  // })
 
 
 
